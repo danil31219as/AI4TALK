@@ -46,6 +46,7 @@ class TalkDatasetTest(torch.utils.data.Dataset):
         self.feature_extractor = feature_extractor
         self.sr = 16000
         self.augmentations = augmentations
+        self.cut()
     
     def __len__(self):
         return len(self.df)

@@ -41,4 +41,4 @@ df['transcription'] = preds
 df["transcription"].str.replace(' ','')
 df["transcription"] = df["transcription"].apply(lambda v: v if v else "SIL")
 df.drop(columns=['audio'])
-df.to_csv("../output/asr-solution.csv", index=False)
+df.to_csv("./output/asr-solution.csv", index=False)
