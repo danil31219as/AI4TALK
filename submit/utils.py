@@ -1,6 +1,6 @@
 from torch.nn.utils.rnn import pad_sequence
 import json
-from transformers import Wav2Vec2Model
+from transformers import Wav2Vec2Model, Wav2Vec2Config
 import torch
 # import torchaudio
 import pandas as pd
@@ -109,7 +109,8 @@ class FeatureExtractor:
 class Wav2VecCTC(torch.nn.Module):
     def __init__(self, vocab_size, dropout=0.0):
         super().__init__()
-        self.encoder = Wav2Vec2Model.from_pretrained('config.json')
+        self.config = Wav2Vec2Config.from_pretrained('config.json')
+        self.encoder = Wav2Vec2Model(self.config)
         self.encoder.config.mask_time_length = 1
         self.dropout = torch.nn.Dropout(dropout)
         output_hidden_size = self.encoder.config.hidden_size
