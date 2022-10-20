@@ -17,7 +17,7 @@ TOKENIZER_PATH = args[1]
 DF_PATH = args[2]
 DEVICE ='cuda'
 BATCH_SIZE=1
-os.makedirs('../output', exist_ok=True)
+os.makedirs('./output', exist_ok=True)
 
 df = pd.read_csv(DF_PATH).rename(columns={'new_path': 'audio_path'})
 
