@@ -38,7 +38,7 @@ class Tokenizer:
     
     @property
     def vocab_size(self):
-
+        return len(self.vocab)
 class TalkDatasetTest(torch.utils.data.Dataset):
     def __init__(self, df, feature_extractor, augmentations=None, stage='train'):
         super().__init__()
@@ -55,12 +55,13 @@ class TalkDatasetTest(torch.utils.data.Dataset):
         files = set(self.df['source'])
         sources = {i:[] for i in files}
         for row in self.df.iloc:
-            sources[row['source']].append([row['id'], row['start'], row['end']])
+            sources[row['source']].append([row['id'],round(self.sr* row['start']), round(self.sr*row['end'])])
         for key in sources.keys():
             audio = librosa.load(row['path'], sr=self.sr)[0]
             for v in sources[key]:
-                cut_audio = audio[v[1], v[2]]
+                cut_audio = audio[v[1]:v[2]]
                 audios[v[0]] = cut_audio
+                # audios.append(cut_audio)
         self.df['audio'] = audios
         
     def __getitem__(self, idx):
@@ -71,7 +72,7 @@ class TalkDatasetTest(torch.utils.data.Dataset):
         if self.augmentations:
             waveform = self.augmentations(waveform)
         sample = {}
-        sample['input_values'] = self.feature_extractor(waveform[0])
+        sample['input_values'] = self.feature_extractor(waveform)
         return sample
 
 
@@ -106,9 +107,9 @@ class FeatureExtractor:
 
 
 class Wav2VecCTC(torch.nn.Module):
-    def __init__(self, vocab_size,weights_path, dropout=0.0):
+    def __init__(self, vocab_size, dropout=0.0):
         super().__init__()
-        self.encoder = Wav2Vec2Model.from_pretrained(weights_path)
+        self.encoder = Wav2Vec2Model.from_pretrained('config.json')
         self.encoder.config.mask_time_length = 1
         self.dropout = torch.nn.Dropout(dropout)
         output_hidden_size = self.encoder.config.hidden_size
@@ -137,10 +138,3 @@ def test(model, loader, device, tokenizer):
             preds.append(pred_str)
     
     return preds
-
-
-
-
-
-
-
